@@ -1,12 +1,21 @@
 {
   "name": "impeccable-pencil",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Design-quality linter for Pencil .pen files. Ported from pbakaus/impeccable.",
   "type": "module",
   "bin": {
     "penlint": "./bin/penlint",
     "impeccable-pencil": "./bin/impeccable-pencil"
   },
+  "files": [
+    "bin/",
+    "src/",
+    "docs/",
+    ".agents/",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
   "scripts": {
     "test": "node --test"
   },
@@ -17,12 +26,20 @@
     "lint",
     "anti-patterns",
     "impeccable",
-    "ai-slop"
+    "ai-slop",
+    "skills"
   ],
   "author": "Emon Sarker",
   "license": "Apache-2.0",
+  "homepage": "https://github.com/emondsarker/impeccable-pencil#readme",
+  "bugs": {
+    "url": "https://github.com/emondsarker/impeccable-pencil/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/emondsarker/impeccable-pencil.git"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
