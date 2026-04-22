@@ -2,7 +2,7 @@
 
 A design-quality linter for Pencil `.pen` files. Port of [pbakaus/impeccable](https://github.com/pbakaus/impeccable).
 
-Status: early prototype. 31 rules catalogued, 17 implemented.
+Status: 31 rules catalogued and implemented.
 
 ## What it catches
 

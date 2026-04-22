@@ -1,6 +1,6 @@
 {
   "name": "impeccable-pencil",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Design-quality linter for Pencil .pen files. Ported from pbakaus/impeccable.",
   "type": "module",
   "bin": {

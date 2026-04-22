@@ -31,7 +31,7 @@ Scope notes:
 
 ### 2. Run every applicable rule
 
-**Implemented rules** (17 of 31) run via the `detect()` function in `impeccable-pencil/src/detect.mjs`. The remaining 14 are catalog-only and require your judgment — flag them as LLM-detected findings, not detector findings.
+All 31 rules run via the `detect()` function in `impeccable-pencil/src/detect.mjs`. No LLM-detected rules remain — everything is deterministic.
 
 Detector input shape:
 

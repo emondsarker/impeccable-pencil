@@ -2,7 +2,7 @@
 
 31 rules, grouped by category. Each rule has an id, severity default, description, detection logic (in terms of `.pen` node properties accessible via the Pencil MCP), and a fix hint.
 
-**Implementation status**: 17 of 31 rules have executable detectors in `src/rules/`. The rest are catalog-only — `/pen-critique` relies on LLM judgment for those. Implemented rules are marked `[impl]` in their heading.
+**Implementation status**: all 31 rules have executable detectors in `src/rules/`. `coral-on-noninteractive` is a no-op unless the detector config names interactive-reserved tokens.
 
 Severity can escalate or de-escalate based on context (e.g. `low-contrast` is P0 when it causes unreadable text, P2 when it's a subtle shift).
 
@@ -10,7 +10,7 @@ Severity can escalate or de-escalate based on context (e.g. `low-contrast` is P0
 
 ## AI Slop (12)
 
-### `side-tab` [impl]
+### `side-tab`
 **Severity**: P1 · **Ported from impeccable**
 A thick stroke on only one side of a frame — the #1 tell of AI-generated UIs.
 
@@ -20,7 +20,7 @@ A thick stroke on only one side of a frame — the #1 tell of AI-generated UIs.
 
 ---
 
-### `border-accent-on-rounded` [impl]
+### `border-accent-on-rounded`
 **Severity**: P1 · **Ported**
 One-sided stroke combined with a rounded corner — the stroke visually clashes with the radius.
 
@@ -30,7 +30,7 @@ One-sided stroke combined with a rounded corner — the stroke visually clashes 
 
 ---
 
-### `overused-font` [impl]
+### `overused-font`
 **Severity**: P1 · **Ported**
 fontFamily is one of the over-deployed defaults. Inherits impeccable's list.
 
@@ -60,7 +60,7 @@ fontSize values cluster too tightly — no clear hierarchy.
 
 ---
 
-### `gradient-text` [impl]
+### `gradient-text`
 **Severity**: P1 · **Ported**
 Text fill is a gradient.
 
@@ -80,7 +80,7 @@ Fills concentrated in purple/violet (hue 260–290, sat > 40%) or cyan-on-dark c
 
 ---
 
-### `nested-cards` [impl]
+### `nested-cards`
 **Severity**: P1 · **Ported**
 Frame with fill inside frame with fill inside frame with fill — three-deep. Only card-like containers count; pills, badges, dots, and dividers are excluded.
 
@@ -102,7 +102,7 @@ One gap or padding value dominates.
 
 ---
 
-### `everything-centered` [impl]
+### `everything-centered`
 **Severity**: P2 · **Ported**
 Most text is center-aligned.
 
@@ -134,7 +134,7 @@ Small rounded-square frame (icon tile) stacked above a heading text — the univ
 
 ## Quality (11)
 
-### `pure-black-white` [impl]
+### `pure-black-white`
 **Severity**: P2 · **Ported**
 Fill is exactly `#000000` or `#FFFFFF` on a background frame.
 
@@ -174,7 +174,7 @@ Text line wider than ~80 characters.
 
 ---
 
-### `cramped-padding` [impl]
+### `cramped-padding`
 **Severity**: P2 · **Ported**
 Text touches the edge of its container.
 
@@ -184,7 +184,7 @@ Text touches the edge of its container.
 
 ---
 
-### `tight-leading` [impl]
+### `tight-leading`
 **Severity**: P2 · **Ported**
 `lineHeight < 1.3`.
 
@@ -204,7 +204,7 @@ Fontsize-inferred heading levels skip within a section.
 
 ---
 
-### `justified-text` [impl]
+### `justified-text`
 **Severity**: P2 · **Ported**
 `textAlign: "justify"`.
 
@@ -214,7 +214,7 @@ Fontsize-inferred heading levels skip within a section.
 
 ---
 
-### `tiny-text` [impl]
+### `tiny-text`
 **Severity**: P1 · **Ported**
 `fontSize < 12`.
 
@@ -224,7 +224,7 @@ Fontsize-inferred heading levels skip within a section.
 
 ---
 
-### `all-caps-body` [impl]
+### `all-caps-body`
 **Severity**: P2 · **Ported**
 Long text set in all-caps.
 
@@ -234,7 +234,7 @@ Long text set in all-caps.
 
 ---
 
-### `wide-tracking` [impl]
+### `wide-tracking`
 **Severity**: P3 · **Ported**
 Body text with `letterSpacing > 0.05em`.
 
@@ -246,7 +246,7 @@ Body text with `letterSpacing > 0.05em`.
 
 ## Pencil-native (8)
 
-### `text-overflow-hug` [impl]
+### `text-overflow-hug`
 **Severity**: P1
 Sentence-length text in a bounded parent without `textGrowth: "fixed-width"` — will overflow because Pencil defaults to hug-text.
 
@@ -258,7 +258,7 @@ Sentence-length text in a bounded parent without `textGrowth: "fixed-width"` —
 
 ---
 
-### `absolute-negative-offset` [impl]
+### `absolute-negative-offset`
 **Severity**: P0
 `layoutPosition: "absolute"` with negative x or y. Pencil clips these silently.
 
@@ -288,7 +288,7 @@ Variable defined in the .pen file but never referenced.
 
 ---
 
-### `ghost-node` [impl]
+### `ghost-node`
 **Severity**: P3
 Empty frame — no children, no text.
 
@@ -308,7 +308,7 @@ Every card-type node has identical symmetric cornerRadius — no shape vocabular
 
 ---
 
-### `long-italic-serif` [impl]
+### `long-italic-serif`
 **Severity**: P2
 Sentence-length text set in italic serif — reads as display calligraphy, not body copy.
 

@@ -20,6 +20,7 @@
       "fontFamily": "DM Sans",
       "fontSize": 16,
       "lineHeight": 1.5,
+      "fill": "$ink",
       "content": "Your health spend is tracking against the goal.",
       "width": "fill_container",
       "textGrowth": "fixed-width"

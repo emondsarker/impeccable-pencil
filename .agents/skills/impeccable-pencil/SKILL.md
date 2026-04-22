@@ -23,50 +23,50 @@ Run this skill once per task, then defer to the specific sub-skill the user is a
 
 ## Rule catalog (summary — see `docs/rule-catalog.md` in the repo for full detection logic)
 
-**Implementation status**: 17 of 31 rules have executable detectors; the remaining 14 are catalog-only and rely on LLM judgment during `/pen-critique`. Implemented rules are marked (✓).
+**Implementation status**: all 31 rules have executable detectors in `src/rules/`. `coral-on-noninteractive` is a no-op until you pass `config.interactiveTokens` to the detector.
 
 ### AI Slop (12 rules)
-| id | what it flags | impl |
-|---|---|---|
-| side-tab | one-sided thick stroke on a frame (`stroke: { left: N }`, N > 1) | ✓ |
-| border-accent-on-rounded | one-sided stroke + `cornerRadius ≥ 8` | ✓ |
-| overused-font | fontFamily in {Inter, Roboto, Helvetica, SF Pro, system-ui} | ✓ |
-| single-font | distinct fontFamily count across text = 1 | |
-| flat-type-hierarchy | sorted fontSize set has adjacent ratio < 1.125 | |
-| gradient-text | text `fill` is a gradient | ✓ |
-| ai-color-palette | fill hue in purple/violet band, or cyan-on-dark combos | |
-| nested-cards | frame-with-fill ≥ 3 levels deep | ✓ |
-| monotonous-spacing | one gap/padding value dominates > 80% of nodes | |
-| everything-centered | > 75% of text nodes have `textAlign: center` | ✓ |
-| dark-glow | dark fill + colored drop-shadow | |
-| icon-tile-stack | small rounded-square frame with icon child stacked above a title | |
+| id | what it flags |
+|---|---|
+| side-tab | one-sided thick stroke on a frame (`stroke: { left: N }`, N > 1) |
+| border-accent-on-rounded | one-sided stroke + `cornerRadius ≥ 8` |
+| overused-font | fontFamily in {Inter, Roboto, Helvetica, SF Pro, system-ui} |
+| single-font | distinct fontFamily count across text = 1 (≥ 5 text nodes) |
+| flat-type-hierarchy | sorted fontSize set has adjacent ratio < 1.125 |
+| gradient-text | text `fill` is a gradient |
+| ai-color-palette | > 30% purple/violet fills, or saturated cyan on a dark parent |
+| nested-cards | card-like filled frame ≥ 3 levels deep |
+| monotonous-spacing | one gap/padding value dominates > 80% of ≥ 10 values |
+| everything-centered | > 75% of aligned text nodes have `textAlign: center` |
+| dark-glow | dark fill + bright or saturated drop-shadow |
+| icon-tile-stack | rounded-square icon tile stacked above a heading |
 
 ### Quality (11 rules)
-| id | what it flags | impl |
-|---|---|---|
-| pure-black-white | fill exactly `#000000` or `#FFFFFF` on background frames | ✓ |
-| gray-on-color | gray text fill on saturated parent fill | |
-| low-contrast | WCAG ratio < 4.5 between text fill and resolved parent bg | |
-| line-length | text with width / avg-char-width > 80ch | |
-| cramped-padding | padding < 12 around text | ✓ |
-| tight-leading | `lineHeight` < 1.3 | ✓ |
-| skipped-heading | heading fontSize bands skipped inside a section | |
-| justified-text | `textAlign: justify` | ✓ |
-| tiny-text | `fontSize < 12` | ✓ |
-| all-caps-body | body-length text with uppercase transform | ✓ |
-| wide-tracking | body text `letterSpacing > 0.05em` | ✓ |
+| id | what it flags |
+|---|---|
+| pure-black-white | fill exactly `#000000` or `#FFFFFF` on background frames |
+| gray-on-color | gray text fill on saturated parent fill |
+| low-contrast | WCAG ratio < 4.5 between text fill and resolved parent bg (P0 if < 3.0) |
+| line-length | body text (≥ 12 words) with `width / (fontSize × 0.5) > 80ch` |
+| cramped-padding | frame with text child, padding < 12 on any side |
+| tight-leading | body text `lineHeight` multiplier < 1.3 |
+| skipped-heading | heading fontSize bands skip a level inside a section |
+| justified-text | `textAlign: justify` |
+| tiny-text | `fontSize < 12` with content > 20 chars |
+| all-caps-body | content > 40 chars set in all-caps |
+| wide-tracking | body text `letterSpacing / fontSize > 0.05` |
 
 ### Pencil-native (8 rules)
-| id | what it flags | impl |
-|---|---|---|
-| text-overflow-hug | sentence-length text in bounded parent missing `textGrowth: "fixed-width"` | ✓ |
-| absolute-negative-offset | `layoutPosition: "absolute"` with negative x or y (Pencil clips these) | ✓ |
-| hardcoded-color | literal hex in `fill`/`stroke` where a token covers that color | |
-| orphan-token | variable defined but never referenced | |
-| ghost-node | empty frame, no children, no content | ✓ |
-| shape-monotony | every card uses identical symmetric cornerRadius | |
-| long-italic-serif | sentence-length text set in Instrument Serif italic (or any italic serif) | ✓ |
-| coral-on-noninteractive | palette-specific: interactive-only token used as fill on a non-interactive surface | |
+| id | what it flags |
+|---|---|
+| text-overflow-hug | sentence-length text in bounded parent missing `textGrowth: "fixed-width"` |
+| absolute-negative-offset | `layoutPosition: "absolute"` with negative x or y (Pencil clips these) |
+| hardcoded-color | literal hex in `fill`/`stroke` where a token covers that exact color |
+| orphan-token | variable defined but never referenced |
+| ghost-node | non-root empty frame, no children, no content |
+| shape-monotony | ≥ 4 cards share identical symmetric cornerRadius (> 90%) |
+| long-italic-serif | sentence-length text (≥ 6 words) set in italic serif |
+| coral-on-noninteractive | config-named interactive token used as fill on a non-interactive surface |
 
 ## Severity ladder
 

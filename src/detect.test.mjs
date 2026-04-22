@@ -34,13 +34,16 @@ test('detect: slop fixture includes a P0 severity', () => {
   assert.ok(findings.some((f) => f.severity === 'P0'), 'slop fixture should include at least one P0 finding');
 });
 
-test('detect: every finding has a nodeId and a message', () => {
+test('detect: every finding has a message, severity, and ruleId', () => {
+  // nodeId may be null for systemic findings (single-font, orphan-token,
+  // monotonous-spacing, etc. — they describe file-wide issues, not a single
+  // node). nodeId is required only for node-scoped rules.
   const findings = detect(readFixture('slop.json'));
   for (const f of findings) {
-    assert.ok(f.nodeId, `finding missing nodeId: ${JSON.stringify(f)}`);
     assert.ok(f.message, `finding missing message: ${JSON.stringify(f)}`);
     assert.ok(f.severity, `finding missing severity: ${JSON.stringify(f)}`);
     assert.ok(f.ruleId, `finding missing ruleId: ${JSON.stringify(f)}`);
+    assert.ok('nodeId' in f, `finding missing nodeId key: ${JSON.stringify(f)}`);
   }
 });
 
