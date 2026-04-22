@@ -23,48 +23,50 @@ Run this skill once per task, then defer to the specific sub-skill the user is a
 
 ## Rule catalog (summary — see `docs/rule-catalog.md` in the repo for full detection logic)
 
+**Implementation status**: 17 of 31 rules have executable detectors; the remaining 14 are catalog-only and rely on LLM judgment during `/pen-critique`. Implemented rules are marked (✓).
+
 ### AI Slop (12 rules)
-| id | what it flags |
-|---|---|
-| side-tab | one-sided thick stroke on a frame (`stroke: { left: N }`, N > 1) |
-| border-accent-on-rounded | one-sided stroke + `cornerRadius ≥ 8` |
-| overused-font | fontFamily in {Inter, Roboto, Helvetica, SF Pro, system-ui} |
-| single-font | distinct fontFamily count across text = 1 |
-| flat-type-hierarchy | sorted fontSize set has adjacent ratio < 1.125 |
-| gradient-text | text `fill` is a gradient |
-| ai-color-palette | fill hue in purple/violet band, or cyan-on-dark combos |
-| nested-cards | frame-with-fill ≥ 3 levels deep |
-| monotonous-spacing | one gap/padding value dominates > 80% of nodes |
-| everything-centered | > 75% of text nodes have `textAlign: center` |
-| dark-glow | dark fill + colored drop-shadow |
-| icon-tile-stack | small rounded-square frame with icon child stacked above a title |
+| id | what it flags | impl |
+|---|---|---|
+| side-tab | one-sided thick stroke on a frame (`stroke: { left: N }`, N > 1) | ✓ |
+| border-accent-on-rounded | one-sided stroke + `cornerRadius ≥ 8` | ✓ |
+| overused-font | fontFamily in {Inter, Roboto, Helvetica, SF Pro, system-ui} | ✓ |
+| single-font | distinct fontFamily count across text = 1 | |
+| flat-type-hierarchy | sorted fontSize set has adjacent ratio < 1.125 | |
+| gradient-text | text `fill` is a gradient | ✓ |
+| ai-color-palette | fill hue in purple/violet band, or cyan-on-dark combos | |
+| nested-cards | frame-with-fill ≥ 3 levels deep | ✓ |
+| monotonous-spacing | one gap/padding value dominates > 80% of nodes | |
+| everything-centered | > 75% of text nodes have `textAlign: center` | ✓ |
+| dark-glow | dark fill + colored drop-shadow | |
+| icon-tile-stack | small rounded-square frame with icon child stacked above a title | |
 
 ### Quality (11 rules)
-| id | what it flags |
-|---|---|
-| pure-black-white | fill exactly `#000000` or `#FFFFFF` on background frames |
-| gray-on-color | gray text fill on saturated parent fill |
-| low-contrast | WCAG ratio < 4.5 between text fill and resolved parent bg |
-| line-length | text with width / avg-char-width > 80ch |
-| cramped-padding | padding < 12 around text |
-| tight-leading | `lineHeight` < 1.3 |
-| skipped-heading | heading fontSize bands skipped inside a section |
-| justified-text | `textAlign: justify` |
-| tiny-text | `fontSize < 12` |
-| all-caps-body | body-length text with uppercase transform |
-| wide-tracking | body text `letterSpacing > 0.05em` |
+| id | what it flags | impl |
+|---|---|---|
+| pure-black-white | fill exactly `#000000` or `#FFFFFF` on background frames | ✓ |
+| gray-on-color | gray text fill on saturated parent fill | |
+| low-contrast | WCAG ratio < 4.5 between text fill and resolved parent bg | |
+| line-length | text with width / avg-char-width > 80ch | |
+| cramped-padding | padding < 12 around text | ✓ |
+| tight-leading | `lineHeight` < 1.3 | ✓ |
+| skipped-heading | heading fontSize bands skipped inside a section | |
+| justified-text | `textAlign: justify` | ✓ |
+| tiny-text | `fontSize < 12` | ✓ |
+| all-caps-body | body-length text with uppercase transform | ✓ |
+| wide-tracking | body text `letterSpacing > 0.05em` | ✓ |
 
 ### Pencil-native (8 rules)
-| id | what it flags |
-|---|---|
-| text-overflow-hug | sentence-length text in bounded parent missing `textGrowth: "fixed-width"` |
-| absolute-negative-offset | `layoutPosition: "absolute"` with negative x or y (Pencil clips these) |
-| hardcoded-color | literal hex in `fill`/`stroke` where a token covers that color |
-| orphan-token | variable defined but never referenced |
-| ghost-node | empty frame, no children, no content |
-| shape-monotony | every card uses identical symmetric cornerRadius |
-| long-italic-serif | sentence-length text set in Instrument Serif italic (or any italic serif) |
-| coral-on-noninteractive | palette-specific: interactive-only token used as fill on a non-interactive surface |
+| id | what it flags | impl |
+|---|---|---|
+| text-overflow-hug | sentence-length text in bounded parent missing `textGrowth: "fixed-width"` | ✓ |
+| absolute-negative-offset | `layoutPosition: "absolute"` with negative x or y (Pencil clips these) | ✓ |
+| hardcoded-color | literal hex in `fill`/`stroke` where a token covers that color | |
+| orphan-token | variable defined but never referenced | |
+| ghost-node | empty frame, no children, no content | ✓ |
+| shape-monotony | every card uses identical symmetric cornerRadius | |
+| long-italic-serif | sentence-length text set in Instrument Serif italic (or any italic serif) | ✓ |
+| coral-on-noninteractive | palette-specific: interactive-only token used as fill on a non-interactive surface | |
 
 ## Severity ladder
 
@@ -83,6 +85,33 @@ Before generating or evaluating a .pen file, establish:
 4. **What's off-limits** — any colors/fonts the brand forbids
 
 If you can't establish #1 and #3, ask the user 2–4 targeted questions before making any node insertions. Skipping this is how AI slop happens.
+
+## Pencil-native conventions
+
+Things the Pencil MCP requires or expects that the rule catalog doesn't capture — follow these regardless of findings.
+
+### Always at session start
+- Call `mcp__pencil__get_editor_state` first to know which .pen file is active and what the user has selected.
+- Call `mcp__pencil__get_guidelines` when starting a design task to load project-specific style guides. Pencil ships its own design guidance — read it before running your own rules.
+- Call `mcp__pencil__get_variables` before any insertion so you use existing tokens instead of hardcoding hex.
+
+### Writing nodes (`batch_design`)
+- **25 operations per call, max.** Split larger edits into sequential batches. Going over causes the tool to reject the batch.
+- **Prefer `U(id, {...})` (update) over `R(id, {...})` (replace)** for in-place changes. Replace is destructive on children.
+- **One semantic intent per batch** — don't mix "fix slop findings" with "rename tokens" in the same call. Makes diffs reviewable.
+- **Use `placeholder: true`** on text whose copy is a draft you expect the user to refine. Signals to downstream tooling that the content isn't final.
+- **Absolute children with `layoutPosition: "absolute"`** need positive x/y (see `absolute-negative-offset` — Pencil clips negatives silently).
+- **Text inside bounded parents** needs `width: "fill_container"` AND `textGrowth: "fixed-width"` (see `text-overflow-hug`) — Pencil defaults text to hug, which overflows.
+
+### Verifying output
+- After each batch, call `mcp__pencil__get_screenshot` and visually review before moving on. The detector catches structural slop but misses visual misalignment, cramped layout, and Z-index collisions.
+- If a fix introduces a new finding, **revert the batch** rather than layering another fix on top. Compounding band-aids is how design debt accrues.
+- For large audits, call `mcp__pencil__snapshot_layout` to capture before/after layout trees for diffing.
+
+### Reading nodes (`batch_get`)
+- Use `patterns` with wildcards (`["*"]`) for whole-file scans.
+- Use `nodeIds` when you already know the targets — cheaper than pattern-matching.
+- `batch_get` is read-only — do not emit the impeccable-pencil reminder before it.
 
 ## Commands provided by this skill pack
 

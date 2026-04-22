@@ -15,10 +15,32 @@ argument-hint: "[file path or node id, optional]"
 
 ### 1. Collect
 
-- `mcp__pencil__get_variables` → token set (needed for `hardcoded-color` and `orphan-token`)
-- `mcp__pencil__batch_get` with a broad pattern (e.g. `[{ type: "frame" }, { type: "text" }, { type: "rectangle" }]`) → full node tree, paginating if necessary
+Gather three inputs. Keep them to the side; the detector needs them all.
+
+```
+editor     = mcp__pencil__get_editor_state({ include_schema: true })
+variables  = mcp__pencil__get_variables()
+nodes      = mcp__pencil__batch_get({ patterns: ["*"] })
+guidelines = mcp__pencil__get_guidelines()   // if the tool is available
+```
+
+Scope notes:
+- If the user named a node id or frame, narrow `batch_get` to that subtree (`nodeIds: [...]`) instead of `*` — faster and more relevant.
+- If the file is large (> 500 nodes), paginate the `batch_get` by subtree and run the detector per-subtree.
+- `get_guidelines` may return project-specific style rules that override or add to the 31-rule catalog — treat them as authoritative.
 
 ### 2. Run every applicable rule
+
+**Implemented rules** (17 of 31) run via the `detect()` function in `impeccable-pencil/src/detect.mjs`. The remaining 14 are catalog-only and require your judgment — flag them as LLM-detected findings, not detector findings.
+
+Detector input shape:
+
+```json
+{
+  "nodes":     [ ...all nodes as returned by batch_get... ],
+  "variables": { "$coral": "#FF6A5B", ... }
+}
+```
 
 Walk the tree and apply each rule from `/impeccable-pencil`'s catalog. For each finding, record:
 
