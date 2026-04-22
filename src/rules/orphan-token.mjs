@@ -1,6 +1,11 @@
 // orphan-token — variable defined in the .pen file but never referenced.
 // Detects by scanning every node's fill/stroke/fontFamily/color-like fields
 // for "$name" references; any variable name not seen is orphaned.
+//
+// This rule only produces accurate output on whole-file scans. When auditing
+// a single screen or subtree, tokens used by other screens appear "orphaned"
+// even though they're referenced elsewhere. Callers signal partial scans via
+// `config.partialScan = true`, which makes this rule a no-op.
 
 const REF_FIELDS = [
   'fill', 'stroke', 'fontFamily', 'color',
@@ -11,7 +16,8 @@ export default {
   id: 'orphan-token',
   severity: 'P3',
   category: 'pencil',
-  check({ nodes, variables }) {
+  check({ nodes, variables, config }) {
+    if (config?.partialScan) return [];
     if (!variables || typeof variables !== 'object') return [];
     // Variables may be stored with or without a leading `$`. Normalize to
     // the name-only form before comparing.

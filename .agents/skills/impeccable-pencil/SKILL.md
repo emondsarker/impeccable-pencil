@@ -136,6 +136,8 @@ The 31 rules are heuristics, not gospel. They're calibrated on AI-slop patterns,
 | `nested-cards` / `shape-monotony` | Design systems frame or component library naturally has many similar shapes side-by-side | Is the node inside a frame named like "Design System", "Components", or similar meta? If yes, drop it. |
 | `ai-color-palette` | A single purple card for branding reasons is fine | Check whether the purple/violet is ≥30% of all filled nodes, not just 1–2. |
 | `low-contrast` | Light text on a gradient intentionally uses the brightest stop for legibility | Compute against the lightest stop of any gradient, not the average. |
+| `cramped-padding` | A list row with `padding: [12, 0]` inside a padded panel is fine — the panel provides the side breathing room. | Check if the flagged frame sits inside a container with padding >= 12. If so, drop. |
+| `orphan-token` | Scoped audits mis-flag tokens used by other screens. | Pass `config.partialScan: true` to the detector for any non-full-file scan. With that flag the rule is a no-op. |
 
 ### Verification protocol
 

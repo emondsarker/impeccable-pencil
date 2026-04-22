@@ -35,7 +35,18 @@ function resolvePadding(n) {
     return { top: p, right: p, bottom: p, left: p };
   }
   if (Array.isArray(p)) {
-    // [top, right, bottom, left] — CSS shorthand order.
+    // Pencil's padding shorthand follows CSS ordering:
+    //   [v, h]        → top=bottom=v, right=left=h
+    //   [t, h, b]     → top=t, right=left=h, bottom=b
+    //   [t, r, b, l]  → literal
+    if (p.length === 2) {
+      const [v = 0, h = 0] = p;
+      return { top: v, right: h, bottom: v, left: h };
+    }
+    if (p.length === 3) {
+      const [t = 0, h = 0, b = 0] = p;
+      return { top: t, right: h, bottom: b, left: h };
+    }
     const [t = 0, r = 0, b = 0, l = 0] = p;
     return { top: t, right: r, bottom: b, left: l };
   }

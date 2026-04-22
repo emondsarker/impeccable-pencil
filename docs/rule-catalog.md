@@ -178,7 +178,11 @@ Text line wider than ~80 characters.
 **Severity**: P2 · **Ported**
 Text touches the edge of its container.
 
-**Detection**: frame containing a text child, with `padding` < 12 (top/right/bottom/left, any side).
+**Detection**: frame containing a text child, with `padding` < 12 (top/right/bottom/left, any side). Padding is resolved from Pencil's shorthand forms:
+- number: all four sides
+- `[v, h]`: top/bottom = v, right/left = h (CSS convention)
+- `[t, h, b]`: top, horizontal, bottom
+- `[t, r, b, l]`: literal per-side
 
 **Fix**: Minimum 12 around body text, 16 for cards.
 
@@ -238,7 +242,12 @@ Long text set in all-caps.
 **Severity**: P3 · **Ported**
 Body text with `letterSpacing > 0.05em`.
 
-**Detection**: text node with `fontSize < 20` AND resolved `letterSpacing > 0.05em` (or its px equivalent).
+**Detection**: text node with `fontSize < 20` AND `letterSpacing / fontSize > 0.05`.
+
+**Exclusions** (eyebrows legitimately track wider):
+- `textTransform: "uppercase"`
+- content is all-caps (no lowercase letters)
+- `fontFamily` matches a known monospace face (JetBrains Mono, IBM Plex Mono, Fira Code, Space Mono, etc.)
 
 **Fix**: Reset letter-spacing on body. Wide tracking is for eyebrows only.
 
@@ -283,6 +292,8 @@ Literal hex value in `fill`/`stroke` when a token covers that exact color.
 Variable defined in the .pen file but never referenced.
 
 **Detection**: variable name from `mcp__pencil__get_variables` not found in any node's `fill`/`stroke`/`fontFamily`/other-ref.
+
+**Scope caveat**: only accurate on whole-file scans. When auditing a single screen or subtree, tokens used by other screens appear "orphaned". Pass `config.partialScan = true` to the detector to disable this rule for scoped audits.
 
 **Fix**: Delete the variable OR mark it as a design-system export only.
 

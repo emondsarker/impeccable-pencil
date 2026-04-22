@@ -22,3 +22,31 @@ test('wide-tracking: ignores no letterSpacing', () => {
   const ctx = buildContext({ nodes: [{ id: 't', type: 'text', fontSize: 16 }] });
   assert.equal(rule.check(ctx).length, 0);
 });
+
+test('wide-tracking: ignores all-caps content (eyebrow)', () => {
+  const ctx = buildContext({
+    nodes: [{ id: 't', type: 'text', fontSize: 11, letterSpacing: 1.6, content: 'WELCOME TO OCEAN' }],
+  });
+  assert.equal(rule.check(ctx).length, 0);
+});
+
+test('wide-tracking: ignores textTransform: uppercase', () => {
+  const ctx = buildContext({
+    nodes: [{ id: 't', type: 'text', fontSize: 11, letterSpacing: 1.6, content: 'welcome to ocean', textTransform: 'uppercase' }],
+  });
+  assert.equal(rule.check(ctx).length, 0);
+});
+
+test('wide-tracking: ignores mono fontFamily (JetBrains Mono)', () => {
+  const ctx = buildContext({
+    nodes: [{ id: 't', type: 'text', fontSize: 13, letterSpacing: 1.6, fontFamily: 'JetBrains Mono', content: 'HSA' }],
+  });
+  assert.equal(rule.check(ctx).length, 0);
+});
+
+test('wide-tracking: still flags sentence-case body with wide tracking', () => {
+  const ctx = buildContext({
+    nodes: [{ id: 't', type: 'text', fontSize: 14, letterSpacing: 2, fontFamily: 'DM Sans', content: 'This is body copy with wide tracking' }],
+  });
+  assert.equal(rule.check(ctx).length, 1);
+});

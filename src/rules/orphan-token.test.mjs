@@ -36,3 +36,23 @@ test('orphan-token: no variables → no findings', () => {
   const ctx = buildContext({ nodes: [{ id: 'n', type: 'frame', fill: '#000' }] });
   assert.equal(rule.check(ctx).length, 0);
 });
+
+test('orphan-token: config.partialScan=true disables the rule entirely', () => {
+  // When auditing one screen, tokens used by other screens would look orphaned.
+  // The caller signals partial scope and the rule becomes a no-op.
+  const ctx = buildContext({
+    nodes: [{ id: 'n', type: 'frame', fill: '$surface' }],
+    variables: { surface: '#FFF', coral: '#FF6A5B', primary: '#2E5585' },
+    config: { partialScan: true },
+  });
+  assert.equal(rule.check(ctx).length, 0);
+});
+
+test('orphan-token: config.partialScan=false still runs (default behavior)', () => {
+  const ctx = buildContext({
+    nodes: [{ id: 'n', type: 'frame', fill: '$surface' }],
+    variables: { surface: '#FFF', orphan: '#000' },
+    config: { partialScan: false },
+  });
+  assert.equal(rule.check(ctx).length, 1);
+});

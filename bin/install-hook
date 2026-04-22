@@ -21,16 +21,21 @@ const HOOK_ID = 'impeccable-pencil-reminder';
 const MATCHER = 'mcp__pencil__(batch_design|replace_all_matching_properties|set_variables|open_document)';
 const REMINDER = [
   '[impeccable-pencil]',
-  'Before this Pencil write, recall the 31-rule catalog:',
-  'avoid side-tabs, overused fonts (Inter/Roboto/Helvetica/Arial),',
-  'nested cards ≥3 deep (substantial panels only — pills/badges/dots do NOT count),',
-  'sentence-length italic serif, absolute-position negative coords,',
-  'missing textGrowth:"fixed-width" on sentence text inside bounded parents,',
-  'pure #000/#FFF background fills, tiny text (<12px), justified/centered-everything,',
-  'tight leading (<1.3), cramped padding (<12), gradient text, and all-caps body.',
-  'Use tokens not hex. Cap batches at 25 ops.',
+  'Before this Pencil write, recall the 31-rule catalog. High-value checks:',
+  '(1) AI slop: side-tabs, overused fonts (Inter/Roboto/Helvetica/Arial/SF Pro),',
+  'nested cards ≥3 deep (substantial panels only — pills/badges/dots don\'t count),',
+  'sentence-length italic serif, gradient text, icon-tile-stack, purple/violet palette,',
+  'everything centered, single-font across the whole file.',
+  '(2) Quality: WCAG contrast ≥ 4.5 for text, tight leading (<1.3), cramped padding (<12),',
+  'tiny text (<12px), pure #000/#FFF background fills, justified/all-caps body,',
+  'line length > 80ch.',
+  '(3) Pencil-native: missing textGrowth:"fixed-width" on sentence text in bounded parents,',
+  'absolute-position negative coords (Pencil clips silently), hardcoded hex when a token covers it,',
+  'orphan/unreferenced variables, shape-monotony (every card identical radius).',
+  'Always use tokens over hex. Cap batches at 25 ops. Prefer U(...) over R(...).',
+  'After each batch, call get_screenshot to verify.',
   'Before flagging anything, verify against size/role/context — 20–60% of raw detector output is FP.',
-  'See .agents/skills/impeccable-pencil/SKILL.md for the full catalog.',
+  'Full catalog + detection logic: .agents/skills/impeccable-pencil/SKILL.md and docs/rule-catalog.md.',
 ].join(' ');
 
 const args = process.argv.slice(2);

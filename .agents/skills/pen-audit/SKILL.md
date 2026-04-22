@@ -38,9 +38,12 @@ Detector input shape:
 ```json
 {
   "nodes":     [ ...all nodes as returned by batch_get... ],
-  "variables": { "$coral": "#FF6A5B", ... }
+  "variables": { "$coral": "#FF6A5B", ... },
+  "config":    { "partialScan": true }
 }
 ```
+
+Set `config.partialScan = true` whenever you're auditing anything less than the full `.pen` file (a single screen, a subtree, a component). It disables `orphan-token`, which produces noise on scoped scans because tokens used elsewhere in the file look "orphaned" locally. Omit the flag (or set `false`) for whole-file audits.
 
 Walk the tree and apply each rule from `/impeccable-pencil`'s catalog. For each finding, record:
 
