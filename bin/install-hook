@@ -1,0 +1,92 @@
+#!/usr/bin/env node
+// install-hook — wires a Claude Code PreToolUse hook that reminds the agent
+// of the impeccable-pencil rules before any mcp__pencil__batch_design call.
+//
+// Usage:
+//   npx impeccable-pencil install-hook           # install in cwd's .claude/settings.json
+//   npx impeccable-pencil install-hook --global  # install in ~/.claude/settings.json
+//   npx impeccable-pencil install-hook --remove  # uninstall
+//
+// Safe to run repeatedly — existing hooks are preserved, the impeccable-pencil
+// entry is replaced if already present.
+
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join, dirname } from 'node:path';
+
+const HOOK_ID = 'impeccable-pencil-reminder';
+const MATCHER = 'mcp__pencil__batch_design';
+const REMINDER = [
+  '[impeccable-pencil]',
+  'Before this Pencil edit, recall the 31-rule catalog:',
+  'avoid side-tabs, overused fonts (Inter/Roboto/Helvetica/Arial),',
+  'nested cards ≥3 deep (substantial panels only — pills/badges/dots do NOT count),',
+  'sentence-length italic serif, absolute-position negative coords,',
+  'missing textGrowth:"fixed-width" on sentence text inside bounded parents,',
+  'and pure #000/#FFF background fills.',
+  'Before flagging anything, verify against size/role/context — 20–60% of raw detector output is FP.',
+  'See .agents/skills/impeccable-pencil/SKILL.md for the full catalog.',
+].join(' ');
+
+const args = process.argv.slice(2);
+const isGlobal = args.includes('--global') || args.includes('-g');
+const isRemove = args.includes('--remove') || args.includes('-r');
+const settingsDir = isGlobal ? join(homedir(), '.claude') : join(process.cwd(), '.claude');
+const settingsPath = join(settingsDir, 'settings.json');
+
+function loadSettings() {
+  if (!existsSync(settingsPath)) return {};
+  try {
+    return JSON.parse(readFileSync(settingsPath, 'utf8'));
+  } catch (err) {
+    console.error(`Failed to parse ${settingsPath}: ${err.message}`);
+    process.exit(1);
+  }
+}
+
+function saveSettings(settings) {
+  if (!existsSync(settingsDir)) mkdirSync(settingsDir, { recursive: true });
+  writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n', 'utf8');
+}
+
+const settings = loadSettings();
+settings.hooks ??= {};
+settings.hooks.PreToolUse ??= [];
+
+// Remove any existing impeccable-pencil entries (identified by our marker).
+const before = settings.hooks.PreToolUse.length;
+settings.hooks.PreToolUse = settings.hooks.PreToolUse.filter(
+  (entry) => !entry.__impeccablePencil,
+);
+const removed = before - settings.hooks.PreToolUse.length;
+
+if (isRemove) {
+  if (removed === 0) {
+    console.log(`Nothing to remove — no impeccable-pencil hook found at ${settingsPath}.`);
+  } else {
+    saveSettings(settings);
+    console.log(`Removed ${removed} impeccable-pencil hook entry/entries from ${settingsPath}.`);
+  }
+  process.exit(0);
+}
+
+// Install fresh entry.
+settings.hooks.PreToolUse.push({
+  __impeccablePencil: HOOK_ID,
+  matcher: MATCHER,
+  hooks: [
+    {
+      type: 'command',
+      command: `echo ${JSON.stringify(REMINDER)}`,
+    },
+  ],
+});
+
+saveSettings(settings);
+const scope = isGlobal ? 'globally' : `in ${process.cwd()}`;
+console.log(`Installed impeccable-pencil PreToolUse hook ${scope}.`);
+console.log(`Wrote: ${settingsPath}`);
+console.log(`Matcher: ${MATCHER}`);
+console.log('');
+console.log('Restart your Claude Code session to pick up the hook.');
+console.log('To remove: npx impeccable-pencil install-hook --remove');

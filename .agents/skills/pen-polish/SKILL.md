@@ -1,7 +1,6 @@
 ---
 name: pen-polish
 description: Apply fixes for anti-pattern and quality findings in a .pen file. Use after /pen-audit or /pen-critique surfaces issues, or when the user asks to clean up / fix / refine a design. Analog of impeccable's /polish, targeted at .pen files.
-version: 0.0.1
 user-invocable: true
 argument-hint: "[comma-separated rule ids, or 'top-n', optional]"
 ---

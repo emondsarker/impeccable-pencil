@@ -18,9 +18,23 @@ Ships as agent skills under `.agents/skills/`. Works with Claude Code, Cursor, C
 
 ```bash
 npx skills add emondsarker/impeccable-pencil
+npx impeccable-pencil install-hook
 ```
 
-Provides slash commands: `/impeccable-pencil`, `/pen-audit`, `/pen-critique`, `/pen-polish`, `/pen-shape`. The core skill auto-loads whenever any `mcp__pencil__*` tool is used or a `.pen` file is mentioned.
+Provides slash commands: `/impeccable-pencil`, `/pen-audit`, `/pen-critique`, `/pen-polish`, `/pen-shape`.
+
+The second command wires a Claude Code `PreToolUse` hook into `.claude/settings.json` that reminds the agent of the rule catalog before every `mcp__pencil__batch_design` call. Without the hook, the skill still works via description-matching on session start — the hook just makes it deterministic.
+
+```bash
+npx impeccable-pencil install-hook -g   # install globally (~/.claude/settings.json)
+npx impeccable-pencil install-hook -r   # remove
+```
+
+## Heuristics, not gospel
+
+The detector rules target common AI-slop tells, but real designs contain legitimate edge cases that match naive versions of those patterns. Raw detector output typically runs 20–60% false positives on a well-designed file.
+
+The `pen-audit` and `pen-critique` skills include a verification protocol that filters known-FP shapes before reporting. When running the CLI directly, apply the same judgment — the rules are a starting point, not a verdict.
 
 ## Run the CLI
 

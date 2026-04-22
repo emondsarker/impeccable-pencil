@@ -4,7 +4,8 @@
   "description": "Design-quality linter for Pencil .pen files. Ported from pbakaus/impeccable.",
   "type": "module",
   "bin": {
-    "penlint": "./bin/penlint"
+    "penlint": "./bin/penlint",
+    "impeccable-pencil": "./bin/impeccable-pencil"
   },
   "scripts": {
     "test": "node --test"

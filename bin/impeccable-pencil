@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+// impeccable-pencil — dispatcher for the package's subcommands.
+//
+//   impeccable-pencil install-hook        wire up Claude Code PreToolUse hook
+//   impeccable-pencil install-hook -g     global (~/.claude/settings.json)
+//   impeccable-pencil install-hook -r     remove the hook
+//
+// More subcommands can land here later (pen-tree-dump, etc).
+
+import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+const [, , cmd, ...rest] = process.argv;
+const root = dirname(fileURLToPath(import.meta.url));
+
+const commands = {
+  'install-hook': () => join(root, 'install-hook'),
+};
+
+if (!cmd || cmd === '--help' || cmd === '-h') {
+  console.log('impeccable-pencil <command>');
+  console.log('');
+  console.log('Commands:');
+  console.log('  install-hook [-g] [-r]   wire up / remove the PreToolUse hook in .claude/settings.json');
+  console.log('');
+  console.log('See README: https://github.com/emondsarker/impeccable-pencil');
+  process.exit(0);
+}
+
+const resolver = commands[cmd];
+if (!resolver) {
+  console.error(`Unknown command: ${cmd}`);
+  console.error(`Try: impeccable-pencil --help`);
+  process.exit(2);
+}
+
+const script = resolver();
+const child = spawn('node', [script, ...rest], { stdio: 'inherit' });
+child.on('exit', (code) => process.exit(code ?? 0));

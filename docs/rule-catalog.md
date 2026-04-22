@@ -80,9 +80,11 @@ Fills concentrated in purple/violet (hue 260–290, sat > 40%) or cyan-on-dark c
 
 ### `nested-cards`
 **Severity**: P1 · **Ported**
-Frame with fill inside frame with fill inside frame with fill — three-deep.
+Frame with fill inside frame with fill inside frame with fill — three-deep. Only card-like containers count; pills, badges, dots, and dividers are excluded.
 
-**Detection**: chain of 3+ `frame`/`rectangle` ancestors where each has a non-transparent `fill`.
+**Detection**: chain of 3+ `frame`/`rectangle` ancestors where each is **card-like** (non-transparent fill AND numeric width ≥ 120 AND numeric height ≥ 80 when given, AND not pill-shaped (`cornerRadius < 100`)).
+
+**Known FP**: pill-shaped status badges and decorative dots inside cards trigger the raw depth check but are filtered by the size + pill exclusion above.
 
 **Fix**: Flatten one level. Use spacing/typography for hierarchy instead of another background.
 
@@ -246,7 +248,9 @@ Body text with `letterSpacing > 0.05em`.
 **Severity**: P1
 Sentence-length text in a bounded parent without `textGrowth: "fixed-width"` — will overflow because Pencil defaults to hug-text.
 
-**Detection**: text node whose content is > 4 words AND whose parent has a bounded width (either fixed or `width: "fill_container"`) AND the text node itself is missing `textGrowth: "fixed-width"`.
+**Detection**: text node whose content is ≥ 5 words AND ≥ 40 characters AND `fontSize ≥ 14` AND `letterSpacing === 0` (or unset) AND not all-caps AND whose parent has a bounded width (either fixed or `width: "fill_container"`) AND the text node itself is missing `textGrowth: "fixed-width"` (or `"fixed-width-height"`).
+
+**Known FP**: eyebrows like `"MONDAY · APRIL 21 · 2026"` split into 5+ tokens but are short, tracked, all-caps, and don't wrap. The letterSpacing + uppercase + fontSize checks filter them.
 
 **Fix**: Set `width: "fill_container"` AND `textGrowth: "fixed-width"` on the text node.
 

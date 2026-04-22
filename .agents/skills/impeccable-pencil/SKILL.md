@@ -1,7 +1,6 @@
 ---
 name: impeccable-pencil
 description: Design-quality principles and anti-pattern catalog for Pencil .pen files. MUST be loaded whenever the agent uses the Pencil MCP server (any mcp__pencil__* tool) or whenever the user mentions a .pen file, a Pencil design, or a /pen-* command. Defines the 31-rule catalog, severity ladder, and "design slop" framing that every other pen-* skill depends on.
-version: 0.0.1
 user-invocable: true
 ---
 
@@ -93,6 +92,30 @@ If you can't establish #1 and #3, ask the user 2–4 targeted questions before m
 | `/pen-critique` | LLM design review + detector synthesis (analog of `/critique`) |
 | `/pen-polish` | apply fixes to the top findings |
 | `/pen-shape` | pre-design discovery interview + brief (analog of `/shape`) |
+
+## False-positive discipline (read before reporting ANY finding)
+
+The 31 rules are heuristics, not gospel. They're calibrated on AI-slop patterns, but any heuristic fires on some legitimate design moves. **Before reporting a finding, verify it against the actual node.**
+
+### Known FP patterns to always check
+
+| Rule | FP shape | How to verify |
+|---|---|---|
+| `nested-cards` | Pill badges, dots, icon tiles, 1-px dividers inside a card inside a screen bg all register as "3-deep filled frames." Ignore them. | Is the flagged node actually **card-like** (substantial panel ≥120×80, padding > 0, not pill-shaped)? If no, it's a FP — drop it. |
+| `text-overflow-hug` | Eyebrows like `"MONDAY · APRIL 21 · 2026"` have 5+ tokens but don't wrap. | Does the text have `letterSpacing > 0`, `fontSize < 14`, or all-caps content? Those are eyebrows — drop it. |
+| `overused-font` | Project might legitimately use Inter as a conscious choice | Check if the project context file or brand direction sanctions the font. If yes, demote to P3 or drop. |
+| `nested-cards` / `shape-monotony` | Design systems frame or component library naturally has many similar shapes side-by-side | Is the node inside a frame named like "Design System", "Components", or similar meta? If yes, drop it. |
+| `ai-color-palette` | A single purple card for branding reasons is fine | Check whether the purple/violet is ≥30% of all filled nodes, not just 1–2. |
+| `low-contrast` | Light text on a gradient intentionally uses the brightest stop for legibility | Compute against the lightest stop of any gradient, not the average. |
+
+### Verification protocol
+
+When running `/pen-audit` or `/pen-critique`:
+
+1. Run the detector, collect raw findings.
+2. For each finding, **read the node's surrounding context** (size, role-name, ancestors) before promoting it into the report.
+3. If the finding matches a known FP shape above, **drop it** — do not report it, do not demote it. (Listing false positives wastes the user's time more than missing a subtle true positive.)
+4. If you dropped findings, briefly note the count at the end of the report: `"filtered 14 false positives (8 pill badges, 6 decorative dots)"`. The user should know you applied judgment.
 
 ## Core DOs and DON'Ts
 

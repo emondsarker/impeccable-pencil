@@ -1,7 +1,6 @@
 ---
 name: pen-audit
 description: Run deterministic anti-pattern checks on a .pen file (or a specific node in one) and produce a scored report with P0–P3 severities. Use when the user asks for an audit, quality check, design review, or anti-pattern scan on a Pencil design. Analog of impeccable's /audit, targeted at .pen files.
-version: 0.0.1
 user-invocable: true
 argument-hint: "[file path or node id, optional]"
 ---
@@ -86,6 +85,18 @@ Recurring patterns, not one-offs.
 - ALWAYS cite the specific `nodeId` for each finding so the user can jump to it.
 - If a rule fires but you're unsure (e.g. ambiguous color classification), mark severity one step lower than the default.
 - If the file has fewer than 5 nodes, do not score — it's a stub; say so and stop.
+
+## False-positive filtering (MANDATORY)
+
+Raw detector output typically contains 20–60% false positives on a well-designed file because rules are heuristic. **Do not dump raw output on the user.** Follow `/impeccable-pencil`'s Verification Protocol:
+
+1. Run the detector, get raw findings.
+2. For each finding, inspect the node: size, role-name, ancestors, styling context.
+3. Drop findings that match known FP shapes (pills inside cards for `nested-cards`, eyebrows for `text-overflow-hug`, etc. — see `/impeccable-pencil`'s FP table).
+4. Report the filtered set.
+5. At the end, disclose: `"filtered N false positives"` with the breakdown. Users should see that judgment was applied, not detector output verbatim.
+
+If after filtering the report has zero findings, say so plainly: `"Clean against the 31-rule catalog."` Don't manufacture low-severity items to fill space.
 
 ## Handoff
 

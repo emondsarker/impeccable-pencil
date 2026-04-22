@@ -1,7 +1,6 @@
 ---
 name: pen-critique
 description: Opinionated design review of a .pen file — LLM aesthetic critique combined with deterministic rule detection. Use when the user asks for a critique, a designer's take, a review with feel (not just mechanics), or a gut-check on whether something looks AI-generated. Analog of impeccable's /critique, targeted at .pen files.
-version: 0.0.1
 user-invocable: true
 argument-hint: "[file path or node id, optional]"
 ---

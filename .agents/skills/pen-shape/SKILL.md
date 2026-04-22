@@ -1,7 +1,6 @@
 ---
 name: pen-shape
 description: Pre-design discovery interview for a .pen feature — produce a design brief before opening Pencil. Use when the user asks to plan a screen, design a flow, or start a new feature in Pencil. Analog of impeccable's /shape, targeted at .pen files.
-version: 0.0.1
 user-invocable: true
 argument-hint: "[feature or screen name]"
 ---
