@@ -40,13 +40,13 @@ impeccable-pencil ships as a set of agent skills in `.agents/skills/`. Any AI ha
 
 ```bash
 # Install into current project (recommended):
-npx skills add emonsarker/impeccable-pencil
+npx skills add emondsarker/impeccable-pencil
 
 # Install globally for your user:
-npx skills add emonsarker/impeccable-pencil -g
+npx skills add emondsarker/impeccable-pencil -g
 
 # Only the auditor, not the whole pack:
-npx skills add emonsarker/impeccable-pencil --skill pen-audit
+npx skills add emondsarker/impeccable-pencil --skill pen-audit
 ```
 
 Skills included: `impeccable-pencil` (core, auto-invokes), `pen-audit`, `pen-critique`, `pen-polish`, `pen-shape`. Slash commands: `/impeccable-pencil`, `/pen-audit`, `/pen-critique`, `/pen-polish`, `/pen-shape`.
