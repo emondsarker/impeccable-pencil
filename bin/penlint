@@ -1,0 +1,53 @@
+#!/usr/bin/env node
+// penlint — CLI entry point.
+//
+// Because .pen files are encrypted, this CLI cannot read them directly.
+// It expects a JSON dump of the node tree + variables as stdin, or a path
+// to a .json file produced by the Pencil MCP bridge.
+//
+// Typical flow:
+//
+//   agent → mcp__pencil__batch_get + get_variables → JSON dump → penlint
+//
+// In the meantime, this binary is a stub that loads the detector and
+// a node-tree fixture, for manual testing.
+
+import { readFileSync } from 'node:fs';
+import { detect } from '../src/detect.mjs';
+
+const args = process.argv.slice(2);
+const inputPath = args.find(a => !a.startsWith('-'));
+
+if (!inputPath) {
+  console.error('Usage: penlint <path-to-nodetree.json>');
+  console.error('');
+  console.error('The JSON file must have shape: { nodes: [...], variables: {...} }');
+  console.error('See fixtures/ for examples.');
+  process.exit(2);
+}
+
+const raw = readFileSync(inputPath, 'utf8');
+const input = JSON.parse(raw);
+const findings = detect(input);
+
+const bySeverity = findings.reduce((acc, f) => {
+  acc[f.severity] = (acc[f.severity] || 0) + 1;
+  return acc;
+}, {});
+
+const json = args.includes('--json');
+if (json) {
+  console.log(JSON.stringify({ findings, summary: bySeverity }, null, 2));
+  process.exit(findings.length ? 1 : 0);
+}
+
+console.log(`penlint — ${findings.length} finding(s)`);
+console.log('Severity breakdown:', bySeverity);
+console.log('');
+for (const f of findings) {
+  console.log(`[${f.severity}] ${f.ruleId} · node=${f.nodeId ?? '-'}`);
+  console.log(`  ${f.message}`);
+  if (f.fix) console.log(`  fix: ${f.fix}`);
+  console.log('');
+}
+process.exit(findings.length ? 1 : 0);

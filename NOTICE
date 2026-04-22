@@ -1,0 +1,15 @@
+impeccable-pencil
+Copyright 2026 Emon Sarker
+
+This product is a port/adaptation of work from:
+
+  impeccable
+  Copyright 2025 Paul Bakaus
+  https://github.com/pbakaus/impeccable
+  Licensed under the Apache License, Version 2.0
+
+The rule catalog, severity taxonomy (P0–P3), command vocabulary
+(/audit, /critique, /polish, /typeset, /shape, etc.), and the "AI slop"
+framing of design anti-patterns originate with that project. Detector
+implementation in this repository is independent and targets `.pen`
+files (the Pencil design tool format) rather than HTML/CSS/JSX.

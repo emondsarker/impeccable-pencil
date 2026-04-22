@@ -1,0 +1,32 @@
+{
+  "nodes": [
+    {
+      "id": "root",
+      "type": "frame",
+      "fill": "$surface",
+      "children": ["hero", "body"]
+    },
+    {
+      "id": "hero",
+      "type": "text",
+      "fontFamily": "Instrument Serif",
+      "fontStyle": "italic",
+      "fontSize": 56,
+      "content": "Today, at a glance."
+    },
+    {
+      "id": "body",
+      "type": "text",
+      "fontFamily": "DM Sans",
+      "fontSize": 16,
+      "lineHeight": 1.5,
+      "content": "Your health spend is tracking against the goal.",
+      "width": "fill_container",
+      "textGrowth": "fixed-width"
+    }
+  ],
+  "variables": {
+    "$surface": "#FAFAF7",
+    "$ink": "#0A0A0F"
+  }
+}

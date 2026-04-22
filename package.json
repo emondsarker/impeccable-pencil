@@ -1,0 +1,27 @@
+{
+  "name": "impeccable-pencil",
+  "version": "0.0.1",
+  "description": "Design-quality linter for Pencil .pen files. Ported from pbakaus/impeccable.",
+  "type": "module",
+  "bin": {
+    "penlint": "./bin/penlint"
+  },
+  "scripts": {
+    "test": "node --test src/**/*.test.mjs"
+  },
+  "keywords": [
+    "pencil",
+    "pen",
+    "design",
+    "lint",
+    "anti-patterns",
+    "impeccable",
+    "ai-slop"
+  ],
+  "author": "Emon Sarker",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emonsarker/impeccable-pencil.git"
+  }
+}

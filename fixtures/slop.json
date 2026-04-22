@@ -1,0 +1,60 @@
+{
+  "nodes": [
+    {
+      "id": "root",
+      "type": "frame",
+      "fill": "#FFFFFF",
+      "children": ["outer"]
+    },
+    {
+      "id": "outer",
+      "type": "frame",
+      "fill": "$surface",
+      "children": ["mid"]
+    },
+    {
+      "id": "mid",
+      "type": "frame",
+      "fill": "$canvas-deep",
+      "children": ["inner", "textA"]
+    },
+    {
+      "id": "inner",
+      "type": "frame",
+      "fill": "#F5F5F5",
+      "stroke": { "left": 4, "right": 0, "top": 0, "bottom": 0 },
+      "cornerRadius": 12,
+      "children": ["textB"]
+    },
+    {
+      "id": "textA",
+      "type": "text",
+      "fontFamily": "Inter",
+      "fontSize": 14,
+      "content": "This is a sentence that is clearly longer than four words and sits in a bounded parent."
+    },
+    {
+      "id": "textB",
+      "type": "text",
+      "fontFamily": "DM Sans",
+      "fontSize": 14,
+      "content": "Ok"
+    },
+    {
+      "id": "glyph",
+      "type": "text",
+      "fontFamily": "Instrument Serif",
+      "fontStyle": "italic",
+      "fontSize": 96,
+      "content": "!",
+      "layoutPosition": "absolute",
+      "x": -12,
+      "y": -32
+    }
+  ],
+  "variables": {
+    "$surface": "#FFFFFF",
+    "$ink": "#0A0A0F",
+    "$canvas-deep": "#E8E3D8"
+  }
+}
