@@ -8,15 +8,20 @@
 
 import { rules } from './rules/index.mjs';
 
-export function detect({ nodes, variables = {}, config = {} }) {
-  const findings = [];
-  const ctx = {
+export function buildContext({ nodes, variables = {}, config = {} }) {
+  return {
     nodes,
     variables,
     config,
     nodeById: Object.fromEntries(nodes.map(n => [n.id, n])),
     parentOf: buildParentMap(nodes),
   };
+}
+
+export function detect(input) {
+  const findings = [];
+  const ctx = buildContext(input);
+  const { config } = ctx;
   for (const rule of rules) {
     if (config.disable?.includes(rule.id)) continue;
     try {

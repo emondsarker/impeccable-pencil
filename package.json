@@ -7,7 +7,7 @@
     "penlint": "./bin/penlint"
   },
   "scripts": {
-    "test": "node --test src/**/*.test.mjs"
+    "test": "node --test"
   },
   "keywords": [
     "pencil",
